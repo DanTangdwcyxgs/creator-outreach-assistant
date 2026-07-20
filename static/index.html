@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>达人沟通台</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand-block">
+      <div class="brand-mark">NH</div>
+      <div>
+        <h1>达人沟通台</h1>
+        <p>New Horizons</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span class="model-state" id="modelState"><i></i><span>正在检查模型</span></span>
+      <button class="button ghost" id="settingsButton" type="button">模型设置</button>
+      <button class="button primary" id="newCreatorButton" type="button">新增达人</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="creator-sidebar">
+      <div class="sidebar-toolbar">
+        <label class="search-field">
+          <span>搜索</span>
+          <input id="creatorSearch" type="search" placeholder="达人、账号或产品">
+        </label>
+      </div>
+      <div class="creator-list" id="creatorList"></div>
+    </aside>
+
+    <section class="conversation-panel">
+      <div class="empty-state" id="emptyState">
+        <strong>选择一位达人</strong>
+        <button class="button primary" id="emptyNewButton" type="button">新增达人</button>
+      </div>
+
+      <div class="conversation-content hidden" id="conversationContent">
+        <div class="creator-header">
+          <div class="creator-title">
+            <div class="avatar" id="creatorAvatar">K</div>
+            <div>
+              <div class="title-line">
+                <h2 id="creatorName">达人</h2>
+                <span class="status-badge" id="creatorStatus">洽谈中</span>
+              </div>
+              <p id="creatorMeta">—</p>
+            </div>
+          </div>
+          <div class="creator-actions">
+            <button class="button ghost" id="profileButton" type="button">编辑档案</button>
+            <button class="button secondary" id="importButton" type="button">导入聊天</button>
+          </div>
+        </div>
+
+        <div class="context-strip">
+          <div>
+            <span>合作摘要</span>
+            <p id="summaryText">暂无摘要</p>
+          </div>
+          <div>
+            <span>下一步</span>
+            <p id="nextActionText">待分析</p>
+          </div>
+        </div>
+
+        <div class="message-stream" id="messageStream"></div>
+      </div>
+    </section>
+
+    <aside class="assistant-panel">
+      <div class="assistant-heading">
+        <div>
+          <span class="eyebrow">当前达人</span>
+          <h2>回复助手</h2>
+        </div>
+        <button class="button ghost compact" id="analyzeButton" type="button" disabled>分析近况</button>
+      </div>
+
+      <label class="field-block">
+        <span>我想表达</span>
+        <textarea id="intentInput" rows="7" placeholder="用中文写下你想告诉她的内容"></textarea>
+      </label>
+
+      <fieldset class="tone-control">
+        <legend>语气</legend>
+        <label><input type="radio" name="tone" value="轻松自然" checked><span>轻松</span></label>
+        <label><input type="radio" name="tone" value="简短直接"><span>简短</span></label>
+        <label><input type="radio" name="tone" value="专业清楚"><span>专业</span></label>
+        <label><input type="radio" name="tone" value="真诚安抚"><span>安抚</span></label>
+      </fieldset>
+
+      <button class="button generate" id="generateButton" type="button" disabled>生成英文回复</button>
+
+      <div class="result-area hidden" id="resultArea">
+        <div class="result-header">
+          <span>英文回复 <small id="resultModel"></small></span>
+          <button class="button ghost compact" id="copyReplyButton" type="button">复制英文</button>
+        </div>
+        <div class="english-reply" id="englishReply"></div>
+        <details open>
+          <summary>中文回译</summary>
+          <p id="chineseTranslation"></p>
+        </details>
+        <details>
+          <summary>处理思路</summary>
+          <p id="strategyText"></p>
+        </details>
+        <div class="risk-note hidden" id="riskNote"></div>
+      </div>
+
+      <div class="assistant-placeholder" id="assistantPlaceholder">
+        <span>回复只使用当前达人的档案与聊天记录</span>
+      </div>
+    </aside>
+  </main>
+
+  <dialog id="creatorDialog">
+    <form method="dialog" id="creatorForm">
+      <div class="dialog-header">
+        <div>
+          <span class="eyebrow">独立档案</span>
+          <h2 id="creatorDialogTitle">新增达人</h2>
+        </div>
+        <button class="close-button" type="button" data-close="creatorDialog" aria-label="关闭">×</button>
+      </div>
+      <input id="creatorId" type="hidden">
+      <div class="form-grid">
+        <label><span>达人名称 *</span><input id="nameInput" required></label>
+        <label><span>账号</span><input id="handleInput" placeholder="TikTok / Instagram"></label>
+        <label><span>合作状态</span>
+          <select id="statusInput">
+            <option>新联系</option><option selected>洽谈中</option><option>已寄样</option>
+            <option>待发视频</option><option>已发布</option><option>待付款</option>
+            <option>已完成</option><option>暂停</option>
+          </select>
+        </label>
+        <label><span>产品</span><input id="productInput" placeholder="例如：五件套太阳镜"></label>
+      </div>
+      <label class="field-block"><span>合作条款</span><textarea id="termsInput" rows="3" placeholder="固定费用、佣金、奖励条件"></textarea></label>
+      <label class="field-block"><span>达人偏好</span><textarea id="styleNotesInput" rows="3" placeholder="语气、内容风格、禁忌和习惯"></textarea></label>
+      <label class="field-block"><span>内部备注</span><textarea id="notesInput" rows="3"></textarea></label>
+      <div class="dialog-actions split-actions">
+        <button class="button danger hidden" id="deleteCreatorButton" type="button">删除达人</button>
+        <div>
+          <button class="button ghost" type="button" data-close="creatorDialog">取消</button>
+          <button class="button primary" type="submit">保存档案</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="importDialog" class="wide-dialog">
+    <form method="dialog" id="importForm">
+      <div class="dialog-header">
+        <div>
+          <span class="eyebrow">本机导入 · 不消耗 API</span>
+          <h2>导入 WhatsApp 聊天</h2>
+        </div>
+        <button class="close-button" type="button" data-close="importDialog" aria-label="关闭">×</button>
+      </div>
+      <div class="import-tabs" role="tablist" aria-label="导入方式">
+        <button class="active" id="pasteImportTab" type="button" role="tab">粘贴当前达人</button>
+        <button id="batchImportTab" type="button" role="tab">批量导入文件</button>
+      </div>
+      <div id="pasteImportPanel" class="import-panel">
+        <label class="field-block">
+          <span>当前达人的聊天文本</span>
+          <textarea id="chatImportInput" rows="16" placeholder="在 WhatsApp 网页中复制聊天内容后粘贴到这里"></textarea>
+        </label>
+      </div>
+      <div id="batchImportPanel" class="import-panel hidden">
+        <label class="file-picker">
+          <input id="batchFilesInput" type="file" accept=".txt,.zip,text/plain,application/zip" multiple>
+          <strong>选择聊天文件</strong>
+          <span>支持同时选择多个 TXT 或 ZIP；同一文件可以重复导入，只会补充新消息。</span>
+        </label>
+        <div class="selected-files" id="selectedFiles">尚未选择文件</div>
+        <div class="import-result hidden" id="batchImportResult"></div>
+      </div>
+      <div class="dialog-actions">
+        <button class="button ghost" type="button" data-close="importDialog">取消</button>
+        <button class="button primary" id="importSubmitButton" type="submit">解析并追加</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="analysisDialog" class="wide-dialog">
+    <div class="dialog-header">
+      <div><span class="eyebrow">AI 分析</span><h2>合作近况</h2></div>
+      <button class="close-button" type="button" data-close="analysisDialog" aria-label="关闭">×</button>
+    </div>
+    <div class="analysis-grid">
+      <section><h3>已确认</h3><ul id="factsList"></ul></section>
+      <section><h3>待确认</h3><ul id="questionsList"></ul></section>
+      <section><h3>风险提醒</h3><ul id="risksList"></ul></section>
+    </div>
+    <div class="dialog-actions"><button class="button primary" type="button" data-close="analysisDialog">完成</button></div>
+  </dialog>
+
+  <dialog id="settingsDialog">
+    <form method="dialog" id="settingsForm">
+      <div class="dialog-header">
+        <div><span class="eyebrow">AI 接口</span><h2>模型设置</h2></div>
+        <button class="close-button" type="button" data-close="settingsDialog" aria-label="关闭">×</button>
+      </div>
+      <label><span>品牌发言人名称</span><input id="businessNameInput" value="New Horizons"></label>
+      <label><span>模型来源</span>
+        <select id="providerInput">
+          <option value="local">本机 LM Studio</option>
+          <option value="gemini">Gemini API</option>
+          <option value="groq">Groq API</option>
+          <option value="openrouter">OpenRouter 免费模型</option>
+          <option value="custom">其他兼容接口</option>
+        </select>
+      </label>
+      <div class="privacy-note" id="privacyNote">
+        本机模式不会把聊天内容发送到网络。Gemini 免费 API 更快，但内容会发送给 Google。
+      </div>
+      <label><span>接口地址</span><input id="baseUrlInput"></label>
+      <label><span>模型名称</span><input id="modelInput"></label>
+      <label><span>API Key</span><input id="apiKeyInput" type="password" placeholder="已保存时留空即可"></label>
+      <label class="check-row"><input id="redactionInput" type="checkbox" checked><span>使用网络模型前隐藏邮箱、电话和详细地址</span></label>
+      <label class="check-row"><input id="fallbackInput" type="checkbox" checked><span>Qwen 不可用时先尝试 Groq 备用模型，再改用本机模型</span></label>
+      <div class="settings-status" id="settingsStatus"></div>
+      <div class="dialog-actions split-actions">
+        <button class="button ghost" id="testProviderButton" type="button">测试连接</button>
+        <div>
+          <button class="button ghost" type="button" data-close="settingsDialog">取消</button>
+          <button class="button primary" type="submit">保存设置</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="/app.js" defer></script>
+</body>
+</html>
