@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "达人沟通台 WhatsApp 同步助手",
+  "version": "1.2.1",
+  "description": "把当前或全部 WhatsApp 网页聊天同步到本机达人沟通台。",
+  "permissions": ["debugger"],
+  "host_permissions": [
+    "http://127.0.0.1:8765/*"
+  ],
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://web.whatsapp.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
